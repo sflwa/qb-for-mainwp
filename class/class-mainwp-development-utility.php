@@ -188,38 +188,6 @@ class MainWP_Development_Utility {
 	}
 
 	/**
-	 * Method download_response_backup_data().
-	 */
-	public static function download_response_backup_data( $resp, $filename ) {
-
-		$content_type     = wp_remote_retrieve_header( $resp, 'content-type' );
-		$content_length   = wp_remote_retrieve_header( $resp, 'content-length' );
-		$content_encoding = wp_remote_retrieve_header( $resp, 'content-encoding' );
-		$accept_ranges    = wp_remote_retrieve_header( $resp, 'accept-ranges' );
-		$last_modified    = wp_remote_retrieve_header( $resp, 'last-modified' );
-
-		$data = wp_remote_retrieve_body( $resp );
-
-		header( 'Pragma: public' );
-		header( 'Expires: 0' );
-		header( 'Content-Description: File Transfer' );
-		header( 'content-Length: ' . $content_length );
-		header( 'Content-Type: ' . $content_type );
-		header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
-
-		header( 'accept-ranges: ' . $accept_ranges );
-		header( 'last-modified: ' . $last_modified );
-
-		header( 'Cache-Control: no-cache' );
-
-		while ( ob_get_level() ) {
-			ob_end_clean();
-		}
-		echo $data;
-		exit();
-	}
-
-	/**
 	 * Method get_nice_url()
 	 *
 	 * Grab url.
