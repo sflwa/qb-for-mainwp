@@ -266,7 +266,7 @@ class MainWP_Development_Utility {
 	 * @param string $message Log info message.
 	 */
 	public static function log_info( $message ) {
-		self::log_debug( $message, 2 );
+		static::log_debug( $message, 2 );
 	}
 
 	/**
@@ -277,10 +277,6 @@ class MainWP_Development_Utility {
 	 * @param string $message Log debug message.
 	 */
 	public static function log_debug( $message, $type = false ) {
-		$cron = '';
-		if ( defined( 'DOING_CRON' ) && DOING_CRON ) {
-			$cron = 'CRON :: ';
-		}
 		// Set color: 0 - LOG, 1 - WARNING, 2 - INFO, 3- DEBUG.
 		$log_color = 3;
 		if ( false !== $type ) {
@@ -289,8 +285,7 @@ class MainWP_Development_Utility {
 				$log_color = 2;
 			}
 		}
-		$log = $cron . $message;
-		do_action( 'mainwp_log_action', 'Development :: ' . $log, MAINWP_DEVELOPMENT_LOG_PRIORITY, $log_color );
+		do_action( 'mainwp_log_action', 'Development :: ' . $message, MAINWP_DEVELOPMENT_LOG_PRIORITY, $log_color );
 	}
 
 }

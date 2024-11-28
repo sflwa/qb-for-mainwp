@@ -51,10 +51,10 @@ class MainWP_Development_Ajax {
 	 * @return void
 	 */
 	public function admin_init() {
-
-        /** Example MainWP AJAX actions.
+        /**
+		 * Example MainWP AJAX actions.
+		 */
 		do_action( 'mainwp_ajax_add_action', 'mainwp_development_do_something', array( &$this, 'ajax_do_something' ) );
-        */
 	}
 
     /**
@@ -65,7 +65,6 @@ class MainWP_Development_Ajax {
 	public function ajax_do_something() {
 
 		do_action( 'mainwp_secure_request', 'mainwp_development_do_something' );
-
 		// Do your PHP Work here then return the results via wp_send_json.
 	}
 }

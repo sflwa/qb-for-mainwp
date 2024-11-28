@@ -37,7 +37,6 @@ class MainWP_Development_Admin {
 		add_filter( 'plugin_row_meta', array( &$this, 'plugin_row_meta' ), 10, 2 );
 		add_action( 'mainwp_delete_site', array( &$this, 'hook_delete_site' ), 10, 1 );
 		add_action( 'admin_enqueue_scripts', array( &$this, 'admin_enqueue_scripts' ) );
-		add_filter( 'mainwp_log_specific_actions', array( $this, 'hook_log_specific_actions' ), 10, 2 );
 
 		MainWP_Development_DB::get_instance()->install();
 		MainWP_Development_Ajax::get_instance();

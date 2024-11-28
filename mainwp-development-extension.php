@@ -25,7 +25,7 @@ if ( ! defined( 'MAINWP_DEVELOPMENT_PLUGIN_URL' ) ) {
 }
 
 if ( ! defined( 'MAINWP_DEVELOPMENT_LOG_PRIORITY' ) ) {
-	define( 'MAINWP_DEVELOPMENT_LOG_PRIORITY', 202304 );
+	define( 'MAINWP_DEVELOPMENT_LOG_PRIORITY', 2024011 );
 }
 
 class MainWP_Development_Extension_Activator {
@@ -55,6 +55,7 @@ class MainWP_Development_Extension_Activator {
 		 * it has to call to show settings for them. In this case, the function is settings.
 		 */
 		add_filter( 'mainwp_getextensions', array( &$this, 'get_this_extension' ) );
+		add_filter( 'mainwp_log_specific_actions', array( $this, 'hook_log_specific' ), 10, 2 );
 
 		/**
 		 * This variable checks to see if MainWP is activated. By default it will return false & return admin notices to the user
@@ -83,7 +84,7 @@ class MainWP_Development_Extension_Activator {
 	 *
 	 * @param string $class_name The name of the class to load.
 	 */
-	function autoload( $class_name ) {
+	public function autoload( $class_name ) {
 
 		if ( 0 === strpos( $class_name, 'MainWP\Extensions\Development' ) ) {
 			// trim the namespace prefix: MainWP\Extensions\Development\.
@@ -107,7 +108,7 @@ class MainWP_Development_Extension_Activator {
 	 * This array is a list of all of the extensions MainWP uses, and the functions that
 	 * it has to call to show settings for them. In this case, the function is settings.
 	 */
-	function get_this_extension( $pArray ) {
+	public function get_this_extension( $pArray ) {
 
 		$pArray[] = array(
 			'plugin'     => __FILE__,
@@ -135,10 +136,12 @@ class MainWP_Development_Extension_Activator {
 	 * This function is called when the plugin is activated. It checks to see if MainWP is activated. If it is, then it calls the functions
 	 * hook_managesites_subpage, hook_get_metaboxes, widgets_screen_options & initiates the main Admin Class that controls the rest of the extension's behavior.
 	 */
-	function activate_this_plugin() {
+	public function activate_this_plugin() {
+
 		$this->mainwpMainActivated = apply_filters( 'mainwp_activated_check', $this->mainwpMainActivated );
 		$this->childEnabled        = apply_filters( 'mainwp_extension_enabled_check', __FILE__ );
 		$this->childKey            = $this->childEnabled['key'];
+
 		if ( function_exists( 'mainwp_current_user_can' ) && ! mainwp_current_user_can( 'extension', 'mainwp-development-extension' ) ) {
 			return;
 		}
@@ -150,6 +153,15 @@ class MainWP_Development_Extension_Activator {
 		MainWP_Development_Admin::get_instance();
 	}
 
+	/**
+	 * Hook hook_log_specific.
+	 *
+	 * @return mixed $inputs.
+	 */
+	public function hook_log_specific( $inputs ) {
+		$inputs[ MAINWP_DEVELOPMENT_LOG_PRIORITY ] = __( 'Development logs', 'mainwp-pro-reports-extension' );
+		return $inputs;
+	}
 	public function get_child_key() {
 		return $this->childKey;
 	}
@@ -163,7 +175,7 @@ class MainWP_Development_Extension_Activator {
 	 *
 	 * @return void
 	 */
-	function admin_notices() {
+	public function admin_notices() {
 		global $current_screen;
 		if ( $current_screen->parent_base == 'plugins' && $this->mainwpMainActivated == false ) {
 			echo '<div class="error"><p>' . sprintf( esc_html__( 'MainWP Development Extension requires %1$sMainWP Dashboard Plugin%2$s to be activated in order to work. Please install and activate %3$sMainWP Dashboard Plugin%4$s first.' ), '<a href="http://mainwp.com/" target="_blank">', '</a>', '<a href="http://mainwp.com/" target="_blank">', '</a>' ) . '</p></div>';
@@ -215,7 +227,7 @@ class MainWP_Development_Extension_Activator {
 			'callback'      => array( MainWP_Development_Widget::get_instance(), 'render_metabox' ),
 		);
 
-		
+
 		return $metaboxes;
 	}
 
