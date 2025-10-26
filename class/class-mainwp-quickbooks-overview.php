@@ -40,18 +40,19 @@ class MainWP_QuickBooks_Overview {
 		?>
 
 		<div class="ui labeled icon inverted menu mainwp-sub-submenu" id="mainwp-quickbooks-menu">
-			<a href="admin.php?page=Extensions-Mainwp-QuickBooks-Extension&tab=connection" class="item <?php echo ( 'connection' == $current_tab ) ? 'active' : ''; ?>"><i class="cloud download icon"></i> <?php esc_html_e( 'QBO Connection', 'mainwp-quickbooks-extension' ); ?></a>
+			<a href="admin.php?page=Extensions-Mainwp-QuickBooks-Extension&tab=connection" class="item <?php echo ( 'connection' == $current_tab || 'oauth_callback' == $current_tab ) ? 'active' : ''; ?>"><i class="cloud download icon"></i> <?php esc_html_e( 'QBO Connection', 'mainwp-quickbooks-extension' ); ?></a>
 			<a href="admin.php?page=Extensions-Mainwp-QuickBooks-Extension&tab=mapping" class="item <?php echo ( 'mapping' == $current_tab ) ? 'active' : ''; ?>"><i class="sitemap icon"></i> <?php esc_html_e( 'Site Mapping', 'mainwp-quickbooks-extension' ); ?></a>
 		</div>
 		<?php
 
 		if ( 'mapping' == $current_tab ) {
 			static::render_mapping_page();
+		} elseif ( 'oauth_callback' == $current_tab ) { // <-- NEW: Handle the callback
+			static::handle_oauth_callback();
 		} else {
 			static::render_connection_page();
 		}
 	}
-
    /**
      * Renders the QuickBooks Online OAuth Connection UI.
      */
@@ -188,4 +189,34 @@ class MainWP_QuickBooks_Overview {
         </table>
         <?php
     }
+
+
+// In class/class-mainwp-quickbooks-overview.php, ADD this new function
+    /**
+     * Handles the redirect back from QuickBooks Online after authorization.
+     */
+    private static function handle_oauth_callback() {
+        if ( isset( $_GET['code'] ) && isset( $_GET['realmId'] ) && isset( $_GET['state'] ) ) {
+            // Success! We received the authorization code.
+            
+            // In a real scenario, you would call a function here to exchange the code for tokens:
+            // MainWP_QuickBooks_Utility::exchange_code_for_tokens( $_GET['code'], $_GET['realmId'], $_GET['state'] );
+            
+            echo '<div class="ui segment green"><h2 class="ui header">QuickBooks Authorization Successful!</h2><p>Your MainWP Dashboard received the authorization code and is now attempting to exchange it for Access Tokens...</p></div>';
+            
+            // To prevent the user from seeing the raw code in the URL, redirect them back to the connection tab (optional)
+            // echo '<script>setTimeout(function() { window.location.href = "admin.php?page=Extensions-Mainwp-QuickBooks-Extension&tab=connection"; }, 3000);</script>';
+
+        } elseif ( isset( $_GET['error'] ) ) {
+            // Failure or user denial
+            $error_description = isset( $_GET['error_description'] ) ? sanitize_text_field( wp_unslash( $_GET['error_description'] ) ) : 'Authorization failed or was denied by the user.';
+            echo '<div class="ui segment red"><h2 class="ui header">QuickBooks Authorization Failed</h2><p>Error: ' . esc_html( $error_description ) . '</p></div>';
+        } else {
+            // Direct access without parameters
+            echo '<div class="ui segment yellow"><h2 class="ui header">Authorization Callback Page</h2><p>This page is the designated callback handler for QuickBooks Online. Please use the "Connect to QuickBooks" button on the connection tab to initiate the OAuth flow.</p></div>';
+        }
+    }
+
+
+	
 }
