@@ -81,7 +81,12 @@ class MainWP_QuickBooks_Admin { // Updated class name
 	 * @return void
 	 */
 	public function admin_enqueue_scripts() {
-		if ( isset( $_GET['page'] ) && ( 'Extensions-Mainwp-QuickBooks-Extension' === $_GET['page'] || 'ManageSitesQuickBooksIndividual' === $_GET['page'] || ( 'managesites' === $_GET['page'] && isset( $_GET['dashboard'] ) ) ) ) {
+		if ( isset( $_GET['page'] ) && ( 
+            'Extensions-Mainwp-QuickBooks-Extension' === $_GET['page'] || 
+            'Extensions-Qb-For-Mainwp' === $_GET['page'] || // <-- ADDED THIS LINE to match your URL
+            'ManageSitesQuickBooksIndividual' === $_GET['page'] || 
+            ( 'managesites' === $_GET['page'] && isset( $_GET['dashboard'] ) ) 
+            ) ) {
 			wp_enqueue_style( 'mainwp-quickbooks-extension', MAINWP_QUICKBOOKS_PLUGIN_URL . 'css/mainwp-quickbooks-extension.css', array(), $this->version );
 			wp_enqueue_script( 'mainwp-quickbooks-extension', MAINWP_QUICKBOOKS_PLUGIN_URL . 'js/mainwp-quickbooks-extension.js', array(), $this->version, true );
 		}
