@@ -322,6 +322,6 @@ class MainWP_Quickbooks_Utility {
 
 		return self::QBO_AUTHORIZE_URL . '?' . http_build_query( $params );
 	}
-}
+
 
 }
