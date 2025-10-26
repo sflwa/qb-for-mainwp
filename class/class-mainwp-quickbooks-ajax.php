@@ -68,35 +68,34 @@ public function admin_init() {
 	 */
 	public function ajax_save_credentials() {
         
-        $utility = MainWP_QuickBooks_Utility::get_instance();
-        
-        // DEBUG: Log the start of the AJAX handler
-        $utility::log_info( 'Starting ajax_save_credentials handler.' );
+        // IMPORTANT: Use direct static call to avoid potential fatal error if $utility variable is not yet an object
+        MainWP_QuickBooks_Utility::log_info( 'Starting ajax_save_credentials handler.' ); // DEBUG - Safest log call
 
 		// 1. Secure the AJAX request using MainWP's hook
 		do_action( 'mainwp_secure_request', 'mainwp_quickbooks_save_credentials' );
 
 		// 2. Security Check (Nonce)
 		if ( ! isset( $_POST['security'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['security'] ) ), 'mainwp-quickbooks-save-credentials' ) ) {
-            $utility::log_info( 'Security check failed. Nonce is missing or invalid.' ); // DEBUG
+            MainWP_QuickBooks_Utility::log_info( 'Security check failed. Nonce is missing or invalid.' ); // DEBUG
 			wp_send_json_error( array( 'message' => 'Security check failed. Please refresh and try again.' ) );
             return;
 		}
         
-        // DEBUG: Log that the security check passed
-        $utility::log_info( 'Security check passed.' );
+        // Get the utility instance here, after the security check has passed
+        $utility = MainWP_QuickBooks_Utility::get_instance();
+        
+        MainWP_QuickBooks_Utility::log_info( 'Security check passed. Utility instance obtained.' ); // DEBUG
 
 		// 3. Sanitize and Validate Input
 		$client_id     = isset( $_POST['client_id'] ) ? sanitize_text_field( wp_unslash( $_POST['client_id'] ) ) : '';
 		$client_secret = isset( $_POST['client_secret'] ) ? sanitize_text_field( wp_unslash( $_POST['client_secret'] ) ) : '';
 		$redirect_uri  = isset( $_POST['redirect_uri'] ) ? esc_url_raw( wp_unslash( $_POST['redirect_uri'] ) ) : '';
         
-        // DEBUG: Log the received data (masked secret)
-        $utility::log_info( 'Received Credentials: Client ID=' . substr($client_id, 0, 8) . '..., Redirect URI=' . $redirect_uri );
+        MainWP_QuickBooks_Utility::log_info( 'Received Credentials: Client ID=' . substr($client_id, 0, 8) . '..., Redirect URI=' . $redirect_uri ); // DEBUG
 
 		// Validation: If any required field is empty, send an error response.
 		if ( empty( $client_id ) || empty( $client_secret ) || empty( $redirect_uri ) ) {
-            $utility::log_info( 'Validation failed: One or more required fields are empty.' ); // DEBUG
+            MainWP_QuickBooks_Utility::log_info( 'Validation failed: All credential fields are required.' ); // DEBUG
 			wp_send_json_error( array( 'message' => 'All credential fields (Client ID, Client Secret, Redirect URI) are required.' ) );
             return;
 		}
@@ -106,8 +105,7 @@ public function admin_init() {
 		$utility->update_setting( 'client_secret', $client_secret );
 		$utility->update_setting( 'redirect_uri', $redirect_uri );
         
-        // DEBUG: Log that the settings were updated
-        $utility::log_info( 'Credentials successfully saved to database.' );
+        MainWP_QuickBooks_Utility::log_info( 'Credentials successfully saved to database. Finishing AJAX request.' ); // DEBUG
 
 		// 5. Send Success Response
 		wp_send_json_success( array( 'message' => 'QuickBooks Credentials saved successfully. Please refresh the page to see the Connect button update.' ) );
