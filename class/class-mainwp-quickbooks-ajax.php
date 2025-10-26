@@ -27,10 +27,11 @@ class MainWP_QuickBooks_Ajax {
 		add_action( 'admin_init', array( &$this, 'admin_init' ) );
 	}
 
-	public function admin_init() {
-		do_action( 'mainwp_ajax_add_action', 'mainwp_quickbooks_save_mapping', array( &$this, 'ajax_save_mapping' ) );
-		// Add other AJAX actions for QBO connection, token refresh, etc.
-	}
+public function admin_init() {
+    do_action( 'mainwp_ajax_add_action', 'mainwp_quickbooks_save_mapping', array( &$this, 'ajax_save_mapping' ) );
+    do_action( 'mainwp_ajax_add_action', 'mainwp_quickbooks_save_credentials', array( &$this, 'ajax_save_credentials' ) ); // <-- ADD THIS LINE
+    // Add other AJAX actions for QBO connection, token refresh, etc.
+}
 
     /**
      * Ajax Save Site Mapping.
@@ -59,4 +60,42 @@ class MainWP_QuickBooks_Ajax {
             wp_send_json_error( array( 'message' => 'Failed to save mapping.' ) );
         }
 	}
+
+// class/class-mainwp-quickbooks-ajax.php
+
+/**
+ * Ajax Save QBO Credentials.
+ */
+public function ajax_save_credentials() {
+
+    // Secure the AJAX request
+    do_action( 'mainwp_secure_request', 'mainwp_quickbooks_save_credentials' );
+
+    // Validate nonce
+    if ( ! isset( $_POST['security'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['security'] ) ), 'mainwp-quickbooks-save-credentials' ) ) {
+        wp_send_json_error( array( 'message' => 'Security check failed.' ) );
+        return;
+    }
+
+    $utility = MainWP_QuickBooks_Utility::get_instance();
+
+    // Sanitize input
+    $client_id     = isset( $_POST['client_id'] ) ? sanitize_text_field( wp_unslash( $_POST['client_id'] ) ) : '';
+    $client_secret = isset( $_POST['client_secret'] ) ? sanitize_text_field( wp_unslash( $_POST['client_secret'] ) ) : '';
+    $redirect_uri  = isset( $_POST['redirect_uri'] ) ? esc_url_raw( wp_unslash( $_POST['redirect_uri'] ) ) : '';
+
+    if ( empty( $client_id ) || empty( $client_secret ) || empty( $redirect_uri ) ) {
+        wp_send_json_error( array( 'message' => 'All credential fields are required.' ) );
+        return;
+    }
+
+    // Save to settings
+    $utility->update_setting( 'client_id', $client_id );
+    $utility->update_setting( 'client_secret', $client_secret );
+    $utility->update_setting( 'redirect_uri', $redirect_uri );
+
+    wp_send_json_success( array( 'message' => 'QuickBooks Credentials saved successfully. Please refresh the page if the "Connect" button does not update.' ) );
+}
+
+	
 }
