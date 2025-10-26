@@ -52,21 +52,60 @@ class MainWP_QuickBooks_Overview {
 		}
 	}
 
-    /**
+   /**
      * Renders the QuickBooks Online OAuth Connection UI.
      */
     private static function render_connection_page() {
-        // In a real implementation, you would check for tokens and show Connect/Disconnect buttons.
-        $connection_status = 'Not Connected'; // Placeholder
+
+        $utility = MainWP_QuickBooks_Utility::get_instance();
+        
+        // Fetch current saved credentials and connection status
+        $client_id = $utility->get_setting( 'client_id' );
+        $client_secret = $utility->get_setting( 'client_secret' );
+        $redirect_uri = $utility->get_setting( 'redirect_uri', 'https://developer.intuit.com/v2/OAuth2Playground/RedirectUrl' ); // Use Playground URL as default suggestion
+        
+        $connection_status = 'Not Connected'; // Placeholder logic
+
+        // This is the full QBO Authorization URL we need to build and use
+        $auth_url = MainWP_QuickBooks_Utility::get_qbo_auth_url();
 
         ?>
         <div class="ui segment">
             <h2 class="ui header">QuickBooks Online Connection</h2>
             <p>Status: **<?php echo esc_html( $connection_status ); ?>**</p>
+            
+            <form id="mainwp-quickbooks-credentials-form" class="ui form">
+                <input type="hidden" name="action" value="mainwp_quickbooks_save_credentials">
+                <?php wp_nonce_field( 'mainwp-quickbooks-save-credentials', 'security' ); ?>
+
+                <h4 class="ui dividing header">QuickBooks API Credentials</h4>
+
+                <div class="field">
+                    <label>Client ID</label>
+                    <input type="text" name="client_id" value="<?php echo esc_attr( $client_id ); ?>" placeholder="Your QBO Client ID">
+                </div>
+                
+                <div class="field">
+                    <label>Client Secret</label>
+                    <input type="password" name="client_secret" value="<?php echo esc_attr( $client_secret ); ?>" placeholder="Your QBO Client Secret">
+                </div>
+                
+                <div class="field">
+                    <label>Redirect URI</label>
+                    <input type="text" name="redirect_uri" value="<?php echo esc_attr( $redirect_uri ); ?>" placeholder="Your QBO Redirect URI (e.g., https://yourdomain.com/wp-admin/admin.php?page=Extensions-Mainwp-QuickBooks-Extension&tab=oauth_callback)">
+                    <p class="description">**You must register this URI in your Intuit Developer App settings.**</p>
+                </div>
+
+                <button class="ui button" type="submit">Save Credentials</button>
+            </form>
+
+            <h4 class="ui dividing header" style="margin-top: 2em;">Connection Authorization</h4>
             <div class="ui form">
-                <?php if ( 'Not Connected' === $connection_status ) : ?>
-                    <a href="[Your_QBO_OAuth_URL]" class="ui primary button"><i class="linkify icon"></i> Connect to QuickBooks</a>
+                <?php if ( 'Not Connected' === $connection_status && ! empty( $auth_url ) ) : ?>
+                    <a href="<?php echo esc_url( $auth_url ); ?>" class="ui primary button"><i class="linkify icon"></i> Connect to QuickBooks</a>
                     <p class="ui message">Click to authorize MainWP to connect to your QuickBooks Online account.</p>
+                <?php elseif ( empty( $auth_url ) ) : ?>
+                    <p class="ui error message">Please enter and save your Client ID and Redirect URI above to enable the connection link.</p>
                 <?php else : ?>
                     <button class="ui red button"><i class="unlink icon"></i> Disconnect</button>
                     <p class="ui message success">Successfully connected to QuickBooks Online.</p>
