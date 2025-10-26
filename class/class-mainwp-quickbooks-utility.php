@@ -1,20 +1,20 @@
 <?php
 /**
- * MainWP Quickbooks Utility
+ * MainWP QuickBooks Utility
  *
  * This class handles the Utility process.
  *
  * @package MainWP/Extensions
  */
 
- namespace MainWP\Extensions\Quickbooks;
+ namespace MainWP\Extensions\QuickBooks;
 
  /**
-  * Class MainWP_Quickbooks_Utility
+  * Class MainWP_QuickBooks_Utility
   *
   * @package MainWP/Extensions
   */
-class MainWP_Quickbooks_Utility {
+class MainWP_QuickBooks_Utility {
 
 	// QBO Fixed API Constants
 	const QBO_AUTHORIZE_URL = 'https://appcenter.intuit.com/connect/oauth2';
@@ -150,8 +150,8 @@ class MainWP_Quickbooks_Utility {
 	 * @return array Child sites array.
 	 */
 	public static function get_websites( $site_id = null ) {
-		global $mainWPQuickbooksExtensionActivator;
-		return apply_filters( 'mainwp_getsites', $mainWPQuickbooksExtensionActivator->get_child_file(), $mainWPQuickbooksExtensionActivator->get_child_key(), $site_id, false );
+		global $mainWPQuickBooksExtensionActivator;
+		return apply_filters( 'mainwp_getsites', $mainWPQuickBooksExtensionActivator->get_child_file(), $mainWPQuickBooksExtensionActivator->get_child_key(), $site_id, false );
 	}
 
 	/**
@@ -174,8 +174,8 @@ class MainWP_Quickbooks_Utility {
 		}
 
 		if ( ! empty( $site_ids ) || ! empty( $group_ids ) ) {
-			global $mainWPQuickbooksExtensionActivator;
-			return apply_filters( 'mainwp_getdbsites', $mainWPQuickbooksExtensionActivator->get_child_file(), $mainWPQuickbooksExtensionActivator->get_child_key(), $site_ids, $group_ids );
+			global $mainWPQuickBooksExtensionActivator;
+			return apply_filters( 'mainwp_getdbsites', $mainWPQuickBooksExtensionActivator->get_child_file(), $mainWPQuickBooksExtensionActivator->get_child_key(), $site_ids, $group_ids );
 		}
 		return false;
 	}
@@ -288,7 +288,7 @@ class MainWP_Quickbooks_Utility {
 				$log_color = 2;
 			}
 		}
-		do_action( 'mainwp_log_action', 'Quickbooks :: ' . $message, MAINWP_QUICKBOOKS_LOG_PRIORITY, $log_color );
+		do_action( 'mainwp_log_action', 'QuickBooks :: ' . $message, MAINWP_QUICKBOOKS_LOG_PRIORITY, $log_color );
 	}
 
 
