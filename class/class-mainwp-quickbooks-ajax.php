@@ -64,38 +64,54 @@ public function admin_init() {
 // class/class-mainwp-quickbooks-ajax.php
 
 /**
- * Ajax Save QBO Credentials.
- */
-public function ajax_save_credentials() {
+	 * Ajax Save QBO Credentials.
+	 */
+	public function ajax_save_credentials() {
+        
+        $utility = MainWP_QuickBooks_Utility::get_instance();
+        
+        // DEBUG: Log the start of the AJAX handler
+        $utility::log_info( 'Starting ajax_save_credentials handler.' );
 
-    // Secure the AJAX request
-    do_action( 'mainwp_secure_request', 'mainwp_quickbooks_save_credentials' );
+		// 1. Secure the AJAX request using MainWP's hook
+		do_action( 'mainwp_secure_request', 'mainwp_quickbooks_save_credentials' );
 
-    // Validate nonce
-    if ( ! isset( $_POST['security'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['security'] ) ), 'mainwp-quickbooks-save-credentials' ) ) {
-        wp_send_json_error( array( 'message' => 'Security check failed.' ) );
-        return;
-    }
+		// 2. Security Check (Nonce)
+		if ( ! isset( $_POST['security'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['security'] ) ), 'mainwp-quickbooks-save-credentials' ) ) {
+            $utility::log_info( 'Security check failed. Nonce is missing or invalid.' ); // DEBUG
+			wp_send_json_error( array( 'message' => 'Security check failed. Please refresh and try again.' ) );
+            return;
+		}
+        
+        // DEBUG: Log that the security check passed
+        $utility::log_info( 'Security check passed.' );
 
-    $utility = MainWP_QuickBooks_Utility::get_instance();
+		// 3. Sanitize and Validate Input
+		$client_id     = isset( $_POST['client_id'] ) ? sanitize_text_field( wp_unslash( $_POST['client_id'] ) ) : '';
+		$client_secret = isset( $_POST['client_secret'] ) ? sanitize_text_field( wp_unslash( $_POST['client_secret'] ) ) : '';
+		$redirect_uri  = isset( $_POST['redirect_uri'] ) ? esc_url_raw( wp_unslash( $_POST['redirect_uri'] ) ) : '';
+        
+        // DEBUG: Log the received data (masked secret)
+        $utility::log_info( 'Received Credentials: Client ID=' . substr($client_id, 0, 8) . '..., Redirect URI=' . $redirect_uri );
 
-    // Sanitize input
-    $client_id     = isset( $_POST['client_id'] ) ? sanitize_text_field( wp_unslash( $_POST['client_id'] ) ) : '';
-    $client_secret = isset( $_POST['client_secret'] ) ? sanitize_text_field( wp_unslash( $_POST['client_secret'] ) ) : '';
-    $redirect_uri  = isset( $_POST['redirect_uri'] ) ? esc_url_raw( wp_unslash( $_POST['redirect_uri'] ) ) : '';
+		// Validation: If any required field is empty, send an error response.
+		if ( empty( $client_id ) || empty( $client_secret ) || empty( $redirect_uri ) ) {
+            $utility::log_info( 'Validation failed: One or more required fields are empty.' ); // DEBUG
+			wp_send_json_error( array( 'message' => 'All credential fields (Client ID, Client Secret, Redirect URI) are required.' ) );
+            return;
+		}
 
-    if ( empty( $client_id ) || empty( $client_secret ) || empty( $redirect_uri ) ) {
-        wp_send_json_error( array( 'message' => 'All credential fields are required.' ) );
-        return;
-    }
+		// 4. Save to settings
+		$utility->update_setting( 'client_id', $client_id );
+		$utility->update_setting( 'client_secret', $client_secret );
+		$utility->update_setting( 'redirect_uri', $redirect_uri );
+        
+        // DEBUG: Log that the settings were updated
+        $utility::log_info( 'Credentials successfully saved to database.' );
 
-    // Save to settings
-    $utility->update_setting( 'client_id', $client_id );
-    $utility->update_setting( 'client_secret', $client_secret );
-    $utility->update_setting( 'redirect_uri', $redirect_uri );
-
-    wp_send_json_success( array( 'message' => 'QuickBooks Credentials saved successfully. Please refresh the page if the "Connect" button does not update.' ) );
-}
+		// 5. Send Success Response
+		wp_send_json_success( array( 'message' => 'QuickBooks Credentials saved successfully. Please refresh the page to see the Connect button update.' ) );
+	}
 
 	
 }
