@@ -3,7 +3,7 @@
   Plugin Name: MainWP QuickBooks Extension
   Plugin URI: https://mainwp.com
   Description: Links QuickBooks Online with MainWP Dashboard for customer and recurring transaction management.
-  Version: 1.0
+  Version: 1.1
   Author: [Your Name/Company]
   Author URI: [Your Website]
   Documentation URI: [Your Docs Link]
