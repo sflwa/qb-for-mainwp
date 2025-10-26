@@ -16,6 +16,9 @@
   */
 class MainWP_Quickbooks_Utility {
 
+	// QBO Fixed API Constants
+	const QBO_AUTHORIZE_URL = 'https://appcenter.intuit.com/connect/oauth2';
+	const QBO_SCOPE = 'com.intuit.quickbooks.accounting';
 
 	private $option_handle = 'mainwp_quickbooks_settings';
 
@@ -287,5 +290,38 @@ class MainWP_Quickbooks_Utility {
 		}
 		do_action( 'mainwp_log_action', 'Quickbooks :: ' . $message, MAINWP_QUICKBOOKS_LOG_PRIORITY, $log_color );
 	}
+
+
+	/**
+	 * Constructs the full QuickBooks Online authorization URL.
+	 *
+	 * @return string The full QBO authorization URL, or an empty string if credentials are missing.
+	 */
+	public static function get_qbo_auth_url() {
+		$utility = self::get_instance();
+
+		// Retrieve credentials from plugin settings (must be saved via admin form)
+		$client_id     = $utility->get_setting( 'client_id' );
+		$redirect_uri  = $utility->get_setting( 'redirect_uri' );
+
+		if ( empty( $client_id ) || empty( $redirect_uri ) ) {
+			return '';
+		}
+
+		// Generate a random state token for CSRF protection
+		$state = wp_create_nonce( 'quickbooks_auth_state' );
+		$utility->update_setting( 'state_token', $state ); // Save token for validation later
+
+		$params = array(
+			'client_id'     => $client_id,
+			'response_type' => 'code',
+			'scope'         => self::QBO_SCOPE,
+			'redirect_uri'  => $redirect_uri,
+			'state'         => $state,
+		);
+
+		return self::QBO_AUTHORIZE_URL . '?' . http_build_query( $params );
+	}
+}
 
 }
