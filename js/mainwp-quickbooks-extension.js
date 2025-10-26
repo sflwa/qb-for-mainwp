@@ -21,16 +21,23 @@ jQuery(document).ready(function ($) {
         button.addClass('loading').prop('disabled', true);
         $('.ui.message.saved-status').remove(); // Clear previous status messages
 
-        // Perform the AJAX call
+      // Perform the AJAX call
         $.post(ajaxurl, data, function (response) {
             button.removeClass('loading').prop('disabled', false);
 
             const status_message = $('<div>').addClass('ui message saved-status');
-
-            if (response.error) {
-                status_message.addClass('error').html('<strong>ERROR:</strong> ' + response.error.message);
+            
+            // CORRECTED LOGIC: Check the 'success' flag from the WP AJAX response
+            if (response.success === false) {
+                // This handles errors returned by wp_send_json_error()
+                let errorMessage = response.data && response.data.message ? response.data.message : 'An unknown error occurred on the server.';
+                status_message.addClass('error').html('<strong>ERROR:</strong> ' + errorMessage);
             } else if (response.success) {
-                status_message.addClass('success').html('<strong>Success:</strong> ' + response.success.message);
+                // This handles successful responses from wp_send_json_success()
+                status_message.addClass('success').html('<strong>Success:</strong> ' + response.data.message);
+            } else {
+                // Fallback for an unexpected response (which is likely what caused the original undefined error)
+                status_message.addClass('error').html('<strong>ERROR:</strong> Unexpected server response.');
             }
 
             // Append the message after the form
