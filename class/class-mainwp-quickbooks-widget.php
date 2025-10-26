@@ -1,20 +1,20 @@
 <?php
 /**
- * MainWP Quickbooks Widget
+ * MainWP QuickBooks Widget
  *
  * This class handles the Widget process.
  *
  * @package MainWP/Extensions
  */
 
- namespace MainWP\Extensions\Quickbooks;
+ namespace MainWP\Extensions\QuickBooks;
 
  /**
-  * Class MainWP_Quickbooks_Widget
+  * Class MainWP_QuickBooks_Widget
   *
   * @package MainWP/Extensions
   */
-class MainWP_Quickbooks_Widget {
+class MainWP_QuickBooks_Widget {
 
 	private static $instance = null;
 
@@ -53,8 +53,8 @@ class MainWP_Quickbooks_Widget {
 		<div class="ui grid">
 			<div class="twelve wide column">
 				<h3 class="ui header handle-drag">
-					<?php esc_html_e( 'Quickbooks Overview Widget', 'mainwp-quickbooks-extension' ); ?>
-					<div class="sub header"><?php esc_html_e( 'This is the Quickbooks Overview Widget.', 'mainwp-quickbooks-extension' ); ?></div>
+					<?php esc_html_e( 'QuickBooks Overview Widget', 'mainwp-quickbooks-extension' ); ?>
+					<div class="sub header"><?php esc_html_e( 'This is the QuickBooks Overview Widget.', 'mainwp-quickbooks-extension' ); ?></div>
 				</h3>
 			</div>
 		</div>
@@ -74,7 +74,7 @@ class MainWP_Quickbooks_Widget {
 		<div class="ui divider" style="margin-left:-1em;margin-right:-1em;"></div>
 		<div class="ui two columns grid">
 			<div class="left aligned column">
-				<a href="admin.php?page=Extensions-Mainwp-Quickbooks-Extension" class="ui basic green button"><?php esc_html_e( 'Quickbooks Dashboard', 'mainwp-quickbooks-extension' ); ?></a>
+				<a href="admin.php?page=Extensions-Mainwp-QuickBooks-Extension" class="ui basic green button"><?php esc_html_e( 'QuickBooks Dashboard', 'mainwp-quickbooks-extension' ); ?></a>
 			</div>
 		</div>
 		<?php
@@ -95,8 +95,8 @@ class MainWP_Quickbooks_Widget {
         <div class="ui grid">
             <div class="twelve wide column">
                 <h3 class="ui header handle-drag">
-					<?php echo __( 'Quickbooks Individual Widget', 'mainwp-quickbooks-extension' ); ?>
-                    <div class="sub header"><?php echo __( 'This is the Quickbooks Individual Widget.', 'mainwp-quickbooks-extension' ); ?></div>
+					<?php echo __( 'QuickBooks Individual Widget', 'mainwp-quickbooks-extension' ); ?>
+                    <div class="sub header"><?php echo __( 'This is the QuickBooks Individual Widget.', 'mainwp-quickbooks-extension' ); ?></div>
                 </h3>
             </div>
         </div>
@@ -116,7 +116,7 @@ class MainWP_Quickbooks_Widget {
         <div class="ui divider" style="margin-left:-1em;margin-right:-1em;"></div>
         <div class="ui two columns grid">
             <div class="left aligned column">
-                <a href="admin.php?page=Extensions-Mainwp-Quickbooks-Extension" class="ui basic green button"><?php esc_html_e( 'Quickbooks Dashboard', 'mainwp-quickbooks-extension' ); ?></a>
+                <a href="admin.php?page=Extensions-Mainwp-QuickBooks-Extension" class="ui basic green button"><?php esc_html_e( 'QuickBooks Dashboard', 'mainwp-quickbooks-extension' ); ?></a>
             </div>
         </div>
 		<?php
